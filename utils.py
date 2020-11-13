@@ -11,5 +11,8 @@ def validate_html(payload):
 def validate_text(text):
     if len(text) == 0:
         return False
-    lang = detect(text)
+	try:        
+    	lang = detect(text)
+    except:
+    	lang = "error"
     return lang.startswith("en")
