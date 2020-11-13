@@ -9,7 +9,7 @@ KBPATH='assets/wikidata-20200203-truthy-uri-tridentdb'
 class TypeRank:
 	"""docstring for TypeRank"""
 	def __init__(self):
-		self.db = trident.Db(KBPATH)
+		#self.db = trident.Db(KBPATH)
 		self.type_map = {
             "PERSON"        : "Q215627",
             "NORP"          : "Q2221906",   
