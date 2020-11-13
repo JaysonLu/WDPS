@@ -10,6 +10,6 @@ def validate_html(payload):
 
 def validate_text(text):
     if len(text) == 0:
-        return false
+        return False
     lang = detect(text)
     return lang.startswith("en")
