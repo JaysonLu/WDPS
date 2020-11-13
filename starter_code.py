@@ -11,19 +11,19 @@ import argparse
 
 es = ES()
 tr = TypeRank()
+cache = {}
 
-def find_labels(payload):
-    if validate_html(payload):
-        return
-    key = payload.rec_headers.get_header(KEYNAME)
+def write_cache(key, metions):
+    metion_cache = {}
+    for metion in metions:
+        if metion in cache:
+            print(key + '\t' + metion + '\t' + cache["metion"])
+        else:
+            metion_cache[metion] = metions[metion]
+    return metion_cache
 
-    ## extract text from html file
-    converter = Html2TextConveter(payload)
-    text = converter.text()
-    # only process English html file
-    if not validate_text(text):
-        return
-    
+def find_labels(text):
+
     ## extract metion from text
     ner = None
     if NLP == "nltk":
@@ -37,7 +37,7 @@ def find_labels(payload):
         sys.exit(0)
 
     metions = ner.extract()
-
+    metions = write_cache(key, metions)
     # query elasticsearch to get candidate entity
     candidate_entity = es.query(metions)
     # rank candidate entity
@@ -55,6 +55,7 @@ def find_labels(payload):
             similarity_rank.append({"entity":item[0], "sim":sim.cosine_similarity()})
         similarity_rank.sort(key=lambda similarity: (similarity["sim"]), reverse=True)
         if len(similarity_rank) > 0:
+            cache["metion"] = similarity_rank[0]["entity"]
             yield key, metion, similarity_rank[0]["entity"]
 
 if __name__ == '__main__':
@@ -62,7 +63,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('INPUT', help='path to warc file')
-    parser.add_argument('--NLP', help='spacy, nltk, stanford', default="spacy")
+    parser.add_argument('--NLP', help='spacy, nltk, stanford', default="nltk")
     parser.add_argument('--type', help='boolean to decide whether to use wikidata service', default=False)
     args = parser.parse_args()
 
@@ -72,7 +73,19 @@ if __name__ == '__main__':
     
     with open(INPUT, 'rb') as stream:
         for payload in ArchiveIterator(stream):
-            for key, label, wikidata_id in find_labels(payload):
+            if validate_html(payload):
+                continue
+            key = payload.rec_headers.get_header(KEYNAME)
+
+            ## extract text from html file
+            converter = Html2TextConveter(payload)
+            text = converter.text()
+            # only process English html file
+            if not validate_text(text):
+                continue
+    
+            for key, label, wikidata_id in find_labels(text):
                 print(key + '\t' + label + '\t' + wikidata_id)
+            
 
     
