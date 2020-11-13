@@ -15,7 +15,7 @@ class SPACY:
 	    # identify the entities with the pretrained model from spacy
 		for ent in doc.ents:
 			if ent.label_ not in ["CARDINAL", "DATE", "QUANTITY", "TIME", "ORDINAL", "MONEY", "PERCENT", "QUANTITY"]:
-				entities[ent.text] = ent.label_
+				entities[ent.text.replace('\t', ' ')]] = ent.label_
 
 		return entities
 		
