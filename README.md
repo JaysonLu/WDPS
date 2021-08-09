@@ -1,2 +1,3 @@
-# WDPS
-Web data processing
+# A NER-Multiple-Choice Entity Linker
+There exists a wide array of tool-kits to tackle each step in the entity linking process. Given this, we have implemented three different NER and similarity measures. With our code, we aim at providing different alternatives to the user, effectively giving him the choice of which method should be used. 
+we use state-of-the-art tools to design an entity linker that allows you to choose among three of the best Named-Entity Recognition (NER) systems: the Standford NER, the Spacy NER and the Natural Lenguage Toolkit (NLTK). After extracting the entities, we use Elasticsearch to generate a candidates list. Another function evaluates and chooses the best solution using trident and one of three distinct similarity measures.
